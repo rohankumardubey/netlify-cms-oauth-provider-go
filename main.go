@@ -10,6 +10,7 @@ import (
 	"github.com/markbates/goth"
 	"github.com/markbates/goth/gothic"
 	"github.com/markbates/goth/providers/bitbucket"
+	"github.com/markbates/goth/providers/gitea"
 	"github.com/markbates/goth/providers/github"
 	"github.com/markbates/goth/providers/gitlab"
 
@@ -17,8 +18,8 @@ import (
 )
 
 var (
-	host         = "localhost:3000"
-	callbackHost = "localhost:3000"
+	port         = "3000"
+	callbackHost = "http://localhost:3000"
 )
 
 const (
@@ -46,7 +47,7 @@ const (
       "authorizing:" + provider,
       "*"
     );
-  })("%s", "%s", %s)
+  })("%s", "%s", "%s")
   </script></head><body></body></html>`
 )
 
@@ -113,39 +114,44 @@ func init() {
 	if err != nil {
 		log.Println(".env file not present. Loading directly from environment")
 	}
-	if hostEnv, ok := os.LookupEnv("HOST"); ok {
-		host = hostEnv
+	if portEnv, ok := os.LookupEnv("PORT"); ok {
+		port = portEnv
 	}
 	if callbackEnv, ok := os.LookupEnv("CALLBACK_HOST"); ok {
 		callbackHost = callbackEnv
 	}
 	var (
 		gitlabProvider goth.Provider
+		giteaProvider goth.Provider
 	)
 	if gitlabServer, ok := os.LookupEnv("GITLAB_SERVER"); ok {
 		gitlabProvider = gitlab.NewCustomisedURL(
 			os.Getenv("GITLAB_KEY"), os.Getenv("GITLAB_SECRET"),
-			fmt.Sprintf("https://%s/callback/gitlab", callbackHost),
+			fmt.Sprintf("%s/callback/gitlab", callbackHost),
 			fmt.Sprintf("https://%s/oauth/authorize", gitlabServer),
 			fmt.Sprintf("https://%s/oauth/token", gitlabServer),
 			fmt.Sprintf("https://%s/api/v3/user", gitlabServer),
 		)
-	} else {
-		gitlabProvider = gitlab.New(
-			os.Getenv("GITLAB_KEY"), os.Getenv("GITLAB_SECRET"),
-			fmt.Sprintf("https://%s/callback/gitlab", callbackHost),
+	} else if giteaServer, ok := os.LookupEnv("GITEA_SERVER"); ok {
+		giteaProvider = gitea.NewCustomisedURL(
+			os.Getenv("GITEA_KEY"), os.Getenv("GITEA_SECRET"),
+			fmt.Sprintf("%s/callback/gitlab", callbackHost),
+			fmt.Sprintf("%s/login/oauth/authorize", giteaServer),
+			fmt.Sprintf("%s/login/oauth/access_token", giteaServer),
+			fmt.Sprintf("%s/api/v1/user", giteaServer),
 		)
 	}
 	goth.UseProviders(
 		github.New(
 			os.Getenv("GITHUB_KEY"), os.Getenv("GITHUB_SECRET"),
-			fmt.Sprintf("https://%s/callback/github", callbackHost),
+			fmt.Sprintf("%s/callback/github", callbackHost),
 		),
 		bitbucket.New(
 			os.Getenv("BITBUCKET_KEY"), os.Getenv("BITBUCKET_SECRET"),
-			fmt.Sprintf("https://%s/callback/bitbucket", callbackHost),
+			fmt.Sprintf("%s/callback/bitbucket", callbackHost),
 		),
 		gitlabProvider,
+		giteaProvider,
 	)
 }
 
@@ -160,6 +166,6 @@ func main() {
 
 	http.Handle("/", router)
 
-	log.Printf("Started running on %s\n", host)
-	log.Println(http.ListenAndServe(host, nil))
+	log.Printf("Started running on %s\n", ":"+port)
+	log.Println(http.ListenAndServe(":"+port, nil))
 }
