@@ -7,17 +7,10 @@ Netlify-CMS oauth client sending token in form as Netlify service itself, implem
 inspired by [netlify-cms-github-oauth-provider](https://github.com/vencax/netlify-cms-github-oauth-provider) (node-js). Thanks Václav!
 
 
-## 1) Install
+## 1) Run
 
 ```bash
-# binary will be $GOPATH/bin/netlify-cms-oauth-provider-go
-curl -sfL https://raw.githubusercontent.com/techknowlogick/netlify-cms-oauth-provider-go/master/install.sh | sh -s -- -b $GOPATH/bin
-
-# or install it into ./bin/
-curl -sfL https://raw.githubusercontent.com/techknowlogick/netlify-cms-oauth-provider-go/master/install.sh | sh -s
-
-# In alpine linux (as it does not come with curl by default)
-wget -O - -q https://raw.githubusercontent.com/techknowlogick/netlify-cms-oauth-provider-go/master/install.sh | sh -s
+go run main.go
 ```
 
 ## 2) Config
@@ -32,6 +25,7 @@ Configuration is done with environment variables, which can be supplied as comma
 PORT=3000
 CALLBACK_HOST=http://localhost:3000
 SESSION_SECRET=your-random-string
+GITEA_SERVER=https://gitea.com
 GITEA_KEY=
 GITEA_SECRET=
 GITHUB_KEY=
