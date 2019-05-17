@@ -61,7 +61,11 @@ func handleMain(res http.ResponseWriter, req *http.Request) {
 
 // GET /auth Page  redirecting after provider get param
 func handleAuth(res http.ResponseWriter, req *http.Request) {
-	url := fmt.Sprintf("auth/%s", req.FormValue("provider"))
+	provider := req.FormValue("provider")
+	if provider == "" {
+		provider = "github"
+	}
+	url := fmt.Sprintf("/auth/%s", provider)
 	log.Printf("redirect to %s\n", url)
 	http.Redirect(res, req, url, http.StatusTemporaryRedirect)
 }
@@ -134,7 +138,7 @@ func init() {
 		goth.UseProviders(
 			gitea.NewCustomisedURL(
 				os.Getenv("GITEA_KEY"), os.Getenv("GITEA_SECRET"),
-				fmt.Sprintf("%s/callback/gitlab", callbackHost),
+				fmt.Sprintf("%s/callback/gitea", callbackHost),
 				fmt.Sprintf("%s/login/oauth/authorize", giteaServer),
 				fmt.Sprintf("%s/login/oauth/access_token", giteaServer),
 				fmt.Sprintf("%s/api/v1/user", giteaServer),
