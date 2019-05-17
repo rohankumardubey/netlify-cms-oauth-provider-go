@@ -1,4 +1,4 @@
-module github.com/kishaningithub/netlify-cms-oauth-provider-go
+module github.com/techknowlogick/netlify-cms-oauth-provider-go
 
 require (
 	cloud.google.com/go v0.39.0 // indirect
