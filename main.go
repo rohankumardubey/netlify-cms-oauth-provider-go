@@ -120,25 +120,25 @@ func init() {
 	if callbackEnv, ok := os.LookupEnv("CALLBACK_HOST"); ok {
 		callbackHost = callbackEnv
 	}
-	var (
-		gitlabProvider goth.Provider
-		giteaProvider goth.Provider
-	)
 	if gitlabServer, ok := os.LookupEnv("GITLAB_SERVER"); ok {
-		gitlabProvider = gitlab.NewCustomisedURL(
-			os.Getenv("GITLAB_KEY"), os.Getenv("GITLAB_SECRET"),
-			fmt.Sprintf("%s/callback/gitlab", callbackHost),
-			fmt.Sprintf("https://%s/oauth/authorize", gitlabServer),
-			fmt.Sprintf("https://%s/oauth/token", gitlabServer),
-			fmt.Sprintf("https://%s/api/v3/user", gitlabServer),
+		goth.UseProviders(
+			gitlab.NewCustomisedURL(
+				os.Getenv("GITLAB_KEY"), os.Getenv("GITLAB_SECRET"),
+				fmt.Sprintf("%s/callback/gitlab", callbackHost),
+				fmt.Sprintf("https://%s/oauth/authorize", gitlabServer),
+				fmt.Sprintf("https://%s/oauth/token", gitlabServer),
+				fmt.Sprintf("https://%s/api/v3/user", gitlabServer),
+			),
 		)
 	} else if giteaServer, ok := os.LookupEnv("GITEA_SERVER"); ok {
-		giteaProvider = gitea.NewCustomisedURL(
-			os.Getenv("GITEA_KEY"), os.Getenv("GITEA_SECRET"),
-			fmt.Sprintf("%s/callback/gitlab", callbackHost),
-			fmt.Sprintf("%s/login/oauth/authorize", giteaServer),
-			fmt.Sprintf("%s/login/oauth/access_token", giteaServer),
-			fmt.Sprintf("%s/api/v1/user", giteaServer),
+		goth.UseProviders(
+			gitea.NewCustomisedURL(
+				os.Getenv("GITEA_KEY"), os.Getenv("GITEA_SECRET"),
+				fmt.Sprintf("%s/callback/gitlab", callbackHost),
+				fmt.Sprintf("%s/login/oauth/authorize", giteaServer),
+				fmt.Sprintf("%s/login/oauth/access_token", giteaServer),
+				fmt.Sprintf("%s/api/v1/user", giteaServer),
+			),
 		)
 	}
 	goth.UseProviders(
@@ -150,8 +150,6 @@ func init() {
 			os.Getenv("BITBUCKET_KEY"), os.Getenv("BITBUCKET_SECRET"),
 			fmt.Sprintf("%s/callback/bitbucket", callbackHost),
 		),
-		gitlabProvider,
-		giteaProvider,
 	)
 }
 
