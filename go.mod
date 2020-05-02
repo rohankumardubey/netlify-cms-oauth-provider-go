@@ -1,5 +1,7 @@
 module github.com/techknowlogick/netlify-cms-oauth-provider-go
 
+go 1.14
+
 require (
 	cloud.google.com/go v0.39.0 // indirect
 	github.com/golang/mock v1.3.1 // indirect
